@@ -1,0 +1,60 @@
+version: '3.8'
+
+networks:
+  fintech-net:
+    driver: bridge
+    name: fintech-net
+
+services:
+  # --- BANCOS RELACIONAIS (Escrita) ---
+  postgres:
+    image: postgres:13-alpine
+    container_name: fintech-postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      # Cria múltiplos bancos na inicialização (script fictício ou manual)
+      POSTGRES_DB: fintech_db 
+    ports:
+      - "5432:5432"
+    networks:
+      - fintech-net
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # --- BANCO NOSQL (Leitura/Extrato) ---
+  mongo:
+    image: mongo:5.0
+    container_name: fintech-mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - fintech-net
+    volumes:
+      - mongodata:/data/db
+
+  # --- MESSAGE BROKER (Eventos) ---
+  rabbitmq:
+    image: rabbitmq:3.9-management
+    container_name: fintech-rabbitmq
+    ports:
+      - "5672:5672"   # Protocolo AMQP
+      - "15672:15672" # Dashboard Web
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - fintech-net
+
+  # --- CACHE & LOCK (Concorrência) ---
+  redis:
+    image: redis:alpine
+    container_name: fintech-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - fintech-net
+
+volumes:
+  pgdata:
+  mongodata:

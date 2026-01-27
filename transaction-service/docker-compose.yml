@@ -1,0 +1,18 @@
+version: '3.8'
+
+networks:
+  fintech-net:
+    external: true
+
+services:
+  transaction-service:
+    build: .
+    container_name: transaction-service
+    ports:
+      - "8083:8080" # Porta Exposta 8083
+    environment:
+      - POSTGRES_URL=jdbc:postgresql://fintech-postgres:5432/fintech_db
+      - MONGO_URL=mongodb://fintech-mongo:27017
+      - RABBITMQ_HOST=fintech-rabbitmq
+    networks:
+      - fintech-net

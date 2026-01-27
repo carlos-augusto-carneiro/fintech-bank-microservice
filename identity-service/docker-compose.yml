@@ -1,0 +1,21 @@
+version: '3.8'
+
+networks:
+  fintech-net:
+    external: true # Usa a rede criada no infra.yml
+
+services:
+  identity-service:
+    build: .
+    container_name: identity-service
+    ports:
+      - "8081:8080" # Porta Exposta 8081
+    environment:
+      - POSTGRES_URL=jdbc:postgresql://fintech-postgres:5432/fintech_db
+      - MONGO_URL=mongodb://fintech-mongo:27017
+      - RABBITMQ_HOST=fintech-rabbitmq
+    networks:
+      - fintech-net
+    depends_on:
+      - postgres      # Atenção: Isso só funciona se estiver no mesmo compose ou se ignorar o check
+                      # Em dev isolado, assumimos que a infra já está de pé via infra.yml
