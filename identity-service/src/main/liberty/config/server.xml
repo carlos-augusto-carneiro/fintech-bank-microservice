@@ -1,11 +1,31 @@
 <server description="defaultServer">
     <featureManager>
         <feature>webProfile-8.0</feature>
+        <feature>jpa-2.2</feature>
+        <feature>cdi-2.0</feature>
     </featureManager>
+
     <basicRegistry id="defaultBasicRegistry" realm="BasicRealm">
         <user name="username" password="password" />
     </basicRegistry>
-    <keyStore id="defaultKeyStore" password="password" />
+
     <httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9080" httpsPort="9443" />
-    <webApplication location="identity-service.war" contextRoot="/"/>
+
+    <webApplication location="identity-service.war" contextRoot="/">
+<!--        <classloader commonLibraryRef="PostgresLib"/>-->
+    </webApplication>
+
+    <library id="PostgresLib">
+        <fileset dir="${server.config.dir}/lib/global" includes="postgresql-*.jar"/>
+    </library>
+
+    <dataSource id="IdentityDS" jndiName="jdbc/IdentityDS">
+        <jdbcDriver libraryRef="PostgresLib" javax.sql.DataSource="org.postgresql.ds.PGSimpleDataSource"/>
+        <properties.postgresql
+                serverName="localhost"
+                portNumber="5432"
+                databaseName="fintech_identity_db"
+                user="postgres"
+                password="password"/>
+    </dataSource>
 </server>
